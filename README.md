@@ -14,7 +14,7 @@
 
 ## 🖥️ Preview
 
-The cheat sheet ships as a single `eda_cheatsheet.html` file with:
+The cheat sheet ships as a single `index.html` file with:
 
 - **Sidebar navigation** to switch between analysis types
 - **3-level tab switcher** (Basic → Intermediate → Advanced)
@@ -29,8 +29,8 @@ The cheat sheet ships as a single `eda_cheatsheet.html` file with:
 ```
 data-analysis-cheatsheet/
 │
-├── eda_cheatsheet.html     # ← The entire cheat sheet (open this)
-├── README.md               # This file
+├── index.html     # ← The entire cheat sheet (open this)
+├── README.md      # This file
 └── LICENSE
 ```
 
@@ -40,16 +40,16 @@ data-analysis-cheatsheet/
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/data-analysis-cheatsheet.git
+git clone https://github.com/nikitasainiii/data-analysis-eda-cheatsheet.git
 
 # Open the cheat sheet — no server needed
 cd data-analysis-cheatsheet
-open eda_cheatsheet.html        # macOS
-xdg-open eda_cheatsheet.html   # Linux
-start eda_cheatsheet.html       # Windows
+open index.html        # macOS
+xdg-open index.html   # Linux
+start index.html       # Windows
 ```
 
-Or just **[download the raw HTML file](./eda_cheatsheet.html)** and open it locally.
+Or just **[download the raw HTML file](./index.html)** and open it locally.
 
 ---
 
@@ -195,7 +195,7 @@ Contributions are welcome! If you'd like to add a new analysis type, fix a bug, 
 # 2. Create a branch
 git checkout -b feature/add-nlp-module
 
-# 3. Make your changes to eda_cheatsheet.html
+# 3. Make your changes to index.html
 # 4. Open a pull request
 ```
 
@@ -215,7 +215,7 @@ Free to use, modify, and distribute. Attribution appreciated but not required.
 Give it a star — it helps others find the repo.
 
 ```
-git clone https://github.com/your-username/data-analysis-cheatsheet.git
+git clone https://github.com/nikitasainiii/data-analysis-eda-cheatsheet.git
 ```
 
 ---
