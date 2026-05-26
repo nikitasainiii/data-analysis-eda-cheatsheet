@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Analysis Master Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--surface:#0c0e1a;--card:#10131f;--border:#1a1f33;--border2:#222840;--text:#dde2f0;--muted:#556080;--faint:#1e2440;--eda:#22d3ee;--inf:#a78bfa;--clu:#34d399;--ts:#fb923c;--coh:#f472b6;--basic:#22d3ee;--inter:#fbbf24;--adv:#f87171;--kw:#f97316;--st:#86efac;--cm:#4a5568;--fn:#c084fc;--nb:#67e8f9;--nm:#fb923c;--va:#93c5fd}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Fraunces',Georgia,serif;display:flex;min-height:100vh;overflow-x:hidden}
+.sidebar{width:258px;min-width:258px;background:var(--surface);border-right:1px solid var(--border);height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-logo{padding:22px 18px 14px;border-bottom:1px solid var(--border)}
+.sb-logo .tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.sb-logo h1{font-size:1rem;font-weight:700;line-height:1.3}
+.level-tabs{display:flex;gap:4px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.lt{flex:1;padding:5px 3px;text-align:center;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.5px;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all .15s;text-transform:uppercase}
+.lt:hover{color:var(--text);border-color:var(--border2)}
+.lt.active[data-level="basic"]{background:rgba(34,211,238,.12);color:var(--basic);border-color:rgba(34,211,238,.3)}
+.lt.active[data-level="inter"]{background:rgba(251,191,36,.12);color:var(--inter);border-color:rgba(251,191,36,.3)}
+.lt.active[data-level="adv"]{background:rgba(248,113,113,.12);color:var(--adv);border-color:rgba(248,113,113,.3)}
+.sb-section{padding:14px 12px 6px}
+.sb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 5px;margin-bottom:5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:7px;cursor:pointer;transition:all .15s;font-size:.8rem;font-weight:600;color:var(--muted);border:1px solid transparent;margin-bottom:2px}
+.nav-item:hover{background:var(--faint);color:var(--text)}.nav-item.active{background:var(--faint);color:var(--text);border-color:var(--border2)}
+.ndot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;line-height:1.8}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(7,8,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between}
+.tb-title{font-size:.9rem;font-weight:700}
+.breadcrumb{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.lbadge{font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:1px;text-transform:uppercase}
+.lbadge.basic{background:rgba(34,211,238,.1);color:var(--basic);border:1px solid rgba(34,211,238,.25)}
+.lbadge.inter{background:rgba(251,191,36,.1);color:var(--inter);border:1px solid rgba(251,191,36,.25)}
+.lbadge.adv{background:rgba(248,113,113,.1);color:var(--adv);border:1px solid rgba(248,113,113,.25)}
+.content{padding:28px 32px 60px;max-width:960px}
+.ph{margin-bottom:32px;padding-bottom:22px;border-bottom:1px solid var(--border)}
+.ph .ptag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:9px;opacity:.7}
+.ph h2{font-size:clamp(1.5rem,3vw,2.3rem);font-weight:900;line-height:1.1;margin-bottom:9px;letter-spacing:-.5px}
+.ph p{color:var(--muted);font-size:.85rem;max-width:540px;line-height:1.65;font-family:'IBM Plex Mono',monospace}
+.sec{margin-bottom:38px}
+.sh{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.snum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);background:var(--card);border:1px solid var(--border);padding:4px 7px;border-radius:4px;margin-top:2px;min-width:34px;text-align:center}
+.si h3{font-size:1rem;font-weight:700;margin-bottom:2px}.si p{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted)}
+.cb{background:#080b14;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:12px}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.ctr{display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.clbl{font-size:12px;font-weight:700}.cac{display:flex;align-items:center;gap:7px}
+.lb{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);background:var(--border);padding:2px 6px;border-radius:3px}
+.cpb{background:none;border:1px solid var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .15s;text-transform:uppercase}
+.cpb:hover{color:var(--text);border-color:var(--border2)}.cpb.ok{border-color:#22d3ee;color:#22d3ee}
+pre{padding:14px 16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.75;color:#b0bbd8}
+pre::-webkit-scrollbar{height:4px}pre::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.kw{color:var(--kw)}.st{color:var(--st)}.cm{color:var(--cm);font-style:italic}.fn{color:var(--fn)}.nb{color:var(--nb)}.nm{color:var(--nm)}.va{color:var(--va)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:860px){.g2{grid-template-columns:1fr}}
+.cbl{background:#080b14;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.cblh{padding:8px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.015)}
+.cblh .lbl{font-size:11px;font-weight:700}
+.note{display:flex;gap:9px;padding:11px 13px;border-radius:7px;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;line-height:1.6}
+.note.info{background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.18);color:#67e8f9}
+.note.warn{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.18);color:#fde68a}
+.note.tip{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18);color:#6ee7b7}
+.note.danger{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);color:#fca5a5}
+.ldiv{display:flex;align-items:center;gap:11px;margin:28px 0 20px}
+.lpill{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 13px;border-radius:20px;white-space:nowrap}
+.lline{flex:1;height:1px;background:var(--border)}
+.pb{background:rgba(34,211,238,.1);color:var(--basic);border:1px solid rgba(34,211,238,.25)}
+.pi{background:rgba(251,191,36,.1);color:var(--inter);border:1px solid rgba(251,191,36,.25)}
+.pa{background:rgba(248,113,113,.1);color:var(--adv);border:1px solid rgba(248,113,113,.25)}
+.apage{display:none}.apage.active{display:block}
+.lsec{display:none}.lsec.active{display:block}
+.ham{display:none;background:none;border:1px solid var(--border);color:var(--text);padding:5px 9px;border-radius:6px;cursor:pointer;font-size:15px}
+@media(max-width:720px){.ham{display:block}.sidebar{position:fixed;left:0;top:0;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.content{padding:18px 15px 48px}.topbar{padding:11px 14px}}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo"><div class="tag">// Analysis Cheat Sheet</div><h1>Data Science<br>Reference Desk</h1></div>
+  <div class="level-tabs">
+    <div class="lt active" data-level="basic" onclick="setLevel('basic')">Basic</div>
+    <div class="lt" data-level="inter" onclick="setLevel('inter')">Mid</div>
+    <div class="lt" data-level="adv" onclick="setLevel('adv')">Adv</div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">// Analysis Types</div>
+    <div class="nav-item active" data-page="eda" onclick="setPage('eda')"><div class="ndot" style="background:var(--eda)"></div>Exploratory Data Analysis</div>
+    <div class="nav-item" data-page="inf" onclick="setPage('inf')"><div class="ndot" style="background:var(--inf)"></div>Inferential Analysis</div>
+    <div class="nav-item" data-page="clu" onclick="setPage('clu')"><div class="ndot" style="background:var(--clu)"></div>Cluster Analysis</div>
+    <div class="nav-item" data-page="ts" onclick="setPage('ts')"><div class="ndot" style="background:var(--ts)"></div>Time Series Analysis</div>
+    <div class="nav-item" data-page="coh" onclick="setPage('coh')"><div class="ndot" style="background:var(--coh)"></div>Cohort Analysis</div>
+  </div>
+  <div class="sb-footer">PYTHON · PANDAS · SCIPY<br>SKLEARN · STATSMODELS<br>SEABORN · MATPLOTLIB</div>
+</aside>
+
+<div class="main">
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="ham" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <div class="tb-title" id="tb-title">Exploratory Data Analysis <span id="tb-sub" style="font-style:italic;color:var(--eda)">— EDA</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="breadcrumb"><span id="bc-p">EDA</span><span>›</span><span id="bc-l">Basic</span></div>
+    <div class="lbadge basic" id="lbadge">BASIC</div>
+  </div>
+</div>
+<div class="content">
+<!-- ══ EDA PAGE ══ -->
+<div class="apage active" id="page-eda">
+<div class="ph"><div class="ptag" style="color:var(--eda)">// Exploratory Data Analysis</div><h2 style="color:var(--eda)">Understand Before<br>You Model</h2><p>Systematic inspection — shape, distributions, correlations, anomalies — before any modelling.</p></div>
+
+<!-- EDA BASIC -->
+<div class="lsec active" id="eda-basic">
+<div class="ldiv"><div class="lline"></div><div class="lpill pb">Basic EDA</div><div class="lline"></div></div>
+<div class="note info">💡 These 6 steps cover 80% of what you need to know about any dataset in under 3 minutes.</div>
+
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Imports &amp; Setup</h3><p>essential libraries</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--eda)"></div><div class="clbl">Install &amp; import essentials</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="cm"># pip install pandas numpy matplotlib seaborn</span>
+<span class="kw">import</span> <span class="va">pandas</span> <span class="kw">as</span> <span class="va">pd</span>
+<span class="kw">import</span> <span class="va">numpy</span> <span class="kw">as</span> <span class="va">np</span>
+<span class="kw">import</span> <span class="va">matplotlib.pyplot</span> <span class="kw">as</span> <span class="va">plt</span>
+<span class="kw">import</span> <span class="va">seaborn</span> <span class="kw">as</span> <span class="va">sns</span>
+
+<span class="va">sns</span>.<span class="fn">set_theme</span>(style=<span class="st">"darkgrid"</span>, font_scale=<span class="nm">1.1</span>)
+<span class="va">pd</span>.<span class="fn">set_option</span>(<span class="st">'display.max_columns'</span>, <span class="nm">None</span>)
+<span class="va">plt</span>.<span class="fn">rcParams</span>[<span class="st">'figure.dpi'</span>] = <span class="nm">120</span></pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Load &amp; First Look</h3><p>read data, inspect shape</p></div></div>
+<div class="g2">
+<div class="cbl"><div class="cblh"><div class="lbl">Load CSV / Excel / JSON</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="va">df</span> = <span class="va">pd</span>.<span class="fn">read_csv</span>(<span class="st">'data.csv'</span>)
+<span class="cm"># with options</span>
+<span class="va">df</span> = <span class="va">pd</span>.<span class="fn">read_csv</span>(<span class="st">'data.csv'</span>,
+    na_values=[<span class="st">'NA'</span>,<span class="st">'?'</span>,<span class="st">''</span>,<span class="st">'-'</span>],
+    parse_dates=[<span class="st">'date_col'</span>],
+    low_memory=<span class="kw">False</span>)
+<span class="va">df</span> = <span class="va">pd</span>.<span class="fn">read_excel</span>(<span class="st">'data.xlsx'</span>)
+<span class="va">df</span> = <span class="va">pd</span>.<span class="fn">read_json</span>(<span class="st">'data.json'</span>)
+<span class="va">df</span> = <span class="va">pd</span>.<span class="fn">read_parquet</span>(<span class="st">'data.parquet'</span>)</pre></div>
+<div class="cbl"><div class="cblh"><div class="lbl">Quick Inspection</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="nb">print</span>(<span class="st">"Shape:"</span>, <span class="va">df</span>.shape)
+<span class="va">df</span>.<span class="fn">head</span>(<span class="nm">5</span>)       <span class="cm"># first rows</span>
+<span class="va">df</span>.<span class="fn">tail</span>(<span class="nm">5</span>)       <span class="cm"># last rows</span>
+<span class="va">df</span>.<span class="fn">sample</span>(<span class="nm">5</span>)    <span class="cm"># random rows</span>
+<span class="va">df</span>.<span class="fn">columns</span>.<span class="fn">tolist</span>()
+<span class="va">df</span>.<span class="fn">dtypes</span>
+<span class="va">df</span>.<span class="fn">info</span>()       <span class="cm"># full overview</span></pre></div>
+</div></div>
+
+<div class="sec"><div class="sh"><div class="snum">03</div><div class="si"><h3>Missing Values &amp; Duplicates</h3><p>detect, count, fix</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--eda)"></div><div class="clbl">Find and handle missing data and duplicates</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">df</span>.<span class="fn">isnull</span>().<span class="fn">sum</span>()                      <span class="cm"># missing count per col</span>
+<span class="va">df</span>.<span class="fn">isnull</span>().<span class="fn">mean</span>() * <span class="nm">100</span>               <span class="cm"># missing % per col</span>
+<span class="va">df</span>.<span class="fn">duplicated</span>().<span class="fn">sum</span>()                  <span class="cm"># duplicate rows</span>
+
+<span class="cm"># Fill missing values</span>
+<span class="va">df</span>[<span class="st">'num_col'</span>].<span class="fn">fillna</span>(<span class="va">df</span>[<span class="st">'num_col'</span>].<span class="fn">median</span>(), inplace=<span class="kw">True</span>)
+<span class="va">df</span>[<span class="st">'cat_col'</span>].<span class="fn">fillna</span>(<span class="va">df</span>[<span class="st">'cat_col'</span>].<span class="fn">mode</span>()[<span class="nm">0</span>], inplace=<span class="kw">True</span>)
+<span class="va">df</span>[<span class="st">'col'</span>].<span class="fn">fillna</span>(<span class="nm">0</span>)                   <span class="cm"># constant fill</span>
+<span class="va">df</span>[<span class="st">'col'</span>].<span class="fn">ffill</span>()                     <span class="cm"># forward fill</span>
+
+<span class="cm"># Remove duplicates</span>
+<span class="va">df</span> = <span class="va">df</span>.<span class="fn">drop_duplicates</span>().<span class="fn">reset_index</span>(drop=<span class="kw">True</span>)</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">04</div><div class="si"><h3>Descriptive Statistics</h3><p>mean, std, quartiles</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--eda)"></div><div class="clbl">Summary stats for numeric and categorical columns</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">df</span>.<span class="fn">describe</span>()                   <span class="cm"># numeric: count/mean/std/min/Q1/Q2/Q3/max</span>
+<span class="va">df</span>.<span class="fn">describe</span>(include=<span class="st">'object'</span>)  <span class="cm"># categorical: count/unique/top/freq</span>
+<span class="va">df</span>.<span class="fn">describe</span>(include=<span class="st">'all'</span>)     <span class="cm"># all columns together</span>
+<span class="va">df</span>[<span class="st">'col'</span>].<span class="fn">value_counts</span>()
+<span class="va">df</span>[<span class="st">'col'</span>].<span class="fn">value_counts</span>(normalize=<span class="kw">True</span>) * <span class="nm">100</span>  <span class="cm"># as %</span>
+<span class="va">df</span>.<span class="fn">nunique</span>()                    <span class="cm"># unique count per col</span></pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">05</div><div class="si"><h3>Basic Visualizations</h3><p>histogram, bar, boxplot, heatmap</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--eda)"></div><div class="clbl">Four essential charts every EDA needs</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="cm"># Histogram — numeric distribution</span>
+<span class="va">df</span>[<span class="st">'num_col'</span>].<span class="fn">hist</span>(bins=<span class="nm">30</span>, edgecolor=<span class="st">'white'</span>); <span class="va">plt</span>.<span class="fn">show</span>()
+
+<span class="cm"># Bar chart — category counts</span>
+<span class="va">df</span>[<span class="st">'cat_col'</span>].<span class="fn">value_counts</span>().<span class="fn">plot</span>(kind=<span class="st">'bar'</span>)
+<span class="va">plt</span>.<span class="fn">xticks</span>(rotation=<span class="nm">45</span>); <span class="va">plt</span>.<span class="fn">show</span>()
+
+<span class="cm"># Boxplot — spread + outliers</span>
+<span class="va">df</span>[[<span class="st">'col1'</span>,<span class="st">'col2'</span>]].<span class="fn">boxplot</span>(); <span class="va">plt</span>.<span class="fn">show</span>()
+
+<span class="cm"># Correlation heatmap</span>
+<span class="va">sns</span>.<span class="fn">heatmap</span>(<span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).<span class="fn">corr</span>(),
+           annot=<span class="kw">True</span>, fmt=<span class="st">'.2f'</span>, cmap=<span class="st">'coolwarm'</span>, center=<span class="nm">0</span>)
+<span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+</div><!-- end eda-basic -->
+
+<!-- EDA INTERMEDIATE -->
+<div class="lsec" id="eda-inter">
+<div class="ldiv"><div class="lline"></div><div class="lpill pi">Intermediate EDA</div><div class="lline"></div></div>
+<div class="note warn">⚡ Intermediate EDA sweeps all columns programmatically, builds full statistical profiles, and hunts multicollinearity.</div>
+
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Full Import Stack</h3><p>all intermediate libraries</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">Complete import + global config</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">import</span> <span class="va">pandas</span> <span class="kw">as</span> <span class="va">pd</span>; <span class="kw">import</span> <span class="va">numpy</span> <span class="kw">as</span> <span class="va">np</span>
+<span class="kw">import</span> <span class="va">matplotlib.pyplot</span> <span class="kw">as</span> <span class="va">plt</span>; <span class="kw">import</span> <span class="va">seaborn</span> <span class="kw">as</span> <span class="va">sns</span>
+<span class="kw">import</span> <span class="va">missingno</span> <span class="kw">as</span> <span class="va">msno</span>
+<span class="kw">from</span> <span class="va">scipy.stats</span> <span class="kw">import</span> <span class="va">skew</span>, <span class="va">kurtosis</span>, <span class="va">shapiro</span>, <span class="va">zscore</span>, <span class="va">chi2_contingency</span>
+<span class="kw">import</span> <span class="va">warnings</span>; <span class="va">warnings</span>.<span class="fn">filterwarnings</span>(<span class="st">'ignore'</span>)
+<span class="va">sns</span>.<span class="fn">set_theme</span>(style=<span class="st">"darkgrid"</span>, palette=<span class="st">"deep"</span>, font_scale=<span class="nm">1.1</span>)
+<span class="va">plt</span>.<span class="fn">rcParams</span>[<span class="st">'figure.dpi'</span>] = <span class="nm">120</span>
+<span class="va">pd</span>.<span class="fn">set_option</span>(<span class="st">'display.float_format'</span>, <span class="st">'{:.4f}'</span>.<span class="fn">format</span>)</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Deep Statistical Profile</h3><p>skew, kurtosis, normality per column</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">Custom stats table — skew, kurtosis, normality, missing%</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">def</span> <span class="fn">deep_stats</span>(<span class="va">df</span>):
+    <span class="va">rows</span> = []
+    <span class="kw">for</span> <span class="va">col</span> <span class="kw">in</span> <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).columns:
+        <span class="va">d</span> = <span class="va">df</span>[<span class="va">col</span>].<span class="fn">dropna</span>()
+        <span class="va">_</span>, <span class="va">p_norm</span> = <span class="fn">shapiro</span>(<span class="va">d</span>.<span class="fn">sample</span>(<span class="fn">min</span>(<span class="nm">5000</span>, <span class="nb">len</span>(<span class="va">d</span>))))
+        <span class="va">rows</span>.<span class="fn">append</span>({
+            <span class="st">'col'</span>: <span class="va">col</span>, <span class="st">'mean'</span>: <span class="va">d</span>.<span class="fn">mean</span>(), <span class="st">'median'</span>: <span class="va">d</span>.<span class="fn">median</span>(),
+            <span class="st">'std'</span>: <span class="va">d</span>.<span class="fn">std</span>(), <span class="st">'skew'</span>: <span class="fn">skew</span>(<span class="va">d</span>), <span class="st">'kurt'</span>: <span class="fn">kurtosis</span>(<span class="va">d</span>),
+            <span class="st">'q1'</span>: <span class="va">d</span>.<span class="fn">quantile</span>(<span class="nm">.25</span>), <span class="st">'q3'</span>: <span class="va">d</span>.<span class="fn">quantile</span>(<span class="nm">.75</span>),
+            <span class="st">'normal'</span>: <span class="va">p_norm</span> &gt; <span class="nm">0.05</span>,
+            <span class="st">'miss%'</span>: <span class="va">df</span>[<span class="va">col</span>].<span class="fn">isna</span>().<span class="fn">mean</span>() * <span class="nm">100</span>
+        })
+    <span class="kw">return</span> <span class="va">pd</span>.<span class="fn">DataFrame</span>(<span class="va">rows</span>).<span class="fn">set_index</span>(<span class="st">'col'</span>)
+
+<span class="fn">deep_stats</span>(<span class="va">df</span>)</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">03</div><div class="si"><h3>All Distributions Grid</h3><p>histogram + KDE + boxplot for every column</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">Auto-grid: 3-panel plot for every numeric column</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">num_cols</span> = <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).columns
+<span class="va">n</span> = <span class="nb">len</span>(<span class="va">num_cols</span>)
+<span class="va">fig</span>, <span class="va">axes</span> = <span class="va">plt</span>.<span class="fn">subplots</span>(<span class="va">n</span>, <span class="nm">3</span>, figsize=(<span class="nm">18</span>, <span class="nm">4</span>*<span class="va">n</span>))
+
+<span class="kw">for</span> <span class="va">i</span>, <span class="va">col</span> <span class="kw">in</span> <span class="nb">enumerate</span>(<span class="va">num_cols</span>):
+    <span class="va">data</span> = <span class="va">df</span>[<span class="va">col</span>].<span class="fn">dropna</span>()
+    <span class="cm"># Histogram</span>
+    <span class="va">axes</span>[<span class="va">i</span>,<span class="nm">0</span>].<span class="fn">hist</span>(<span class="va">data</span>, bins=<span class="nm">30</span>, edgecolor=<span class="st">'white'</span>, alpha=<span class="nm">.8</span>)
+    <span class="va">axes</span>[<span class="va">i</span>,<span class="nm">0</span>].<span class="fn">set_title</span>(<span class="st">f'{col}  skew={skew(data):.2f}'</span>)
+    <span class="cm"># KDE</span>
+    <span class="va">sns</span>.<span class="fn">kdeplot</span>(<span class="va">data</span>, ax=<span class="va">axes</span>[<span class="va">i</span>,<span class="nm">1</span>], fill=<span class="kw">True</span>, color=<span class="st">'coral'</span>)
+    <span class="va">axes</span>[<span class="va">i</span>,<span class="nm">1</span>].<span class="fn">set_title</span>(<span class="st">f'{col}  kurt={kurtosis(data):.2f}'</span>)
+    <span class="cm"># Boxplot</span>
+    <span class="va">axes</span>[<span class="va">i</span>,<span class="nm">2</span>].<span class="fn">boxplot</span>(<span class="va">data</span>, vert=<span class="kw">False</span>, patch_artist=<span class="kw">True</span>)
+    <span class="va">axes</span>[<span class="va">i</span>,<span class="nm">2</span>].<span class="fn">set_title</span>(<span class="st">f'{col} — Boxplot'</span>)
+
+<span class="va">plt</span>.<span class="fn">tight_layout</span>(); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">04</div><div class="si"><h3>Missing Value Visualisation</h3><p>missingno matrix, bar, heatmap</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">Visual missing-data patterns with missingno</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="cm"># pip install missingno</span>
+<span class="kw">import</span> <span class="va">missingno</span> <span class="kw">as</span> <span class="va">msno</span>
+<span class="va">msno</span>.<span class="fn">matrix</span>(<span class="va">df</span>)      <span class="cm"># which rows are null</span>
+<span class="va">msno</span>.<span class="fn">bar</span>(<span class="va">df</span>)         <span class="cm"># completeness per column</span>
+<span class="va">msno</span>.<span class="fn">heatmap</span>(<span class="va">df</span>)    <span class="cm"># correlated missingness</span>
+<span class="va">msno</span>.<span class="fn">dendrogram</span>(<span class="va">df</span>) <span class="cm"># clustered null patterns</span>
+<span class="va">plt</span>.<span class="fn">show</span>()
+
+<span class="cm"># Smart imputation</span>
+<span class="kw">from</span> <span class="va">sklearn.impute</span> <span class="kw">import</span> <span class="va">KNNImputer</span>
+<span class="va">imp</span> = <span class="va">KNNImputer</span>(n_neighbors=<span class="nm">5</span>)
+<span class="va">num_cols</span> = <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).columns
+<span class="va">df</span>[<span class="va">num_cols</span>] = <span class="va">imp</span>.<span class="fn">fit_transform</span>(<span class="va">df</span>[<span class="va">num_cols</span>])</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">05</div><div class="si"><h3>Bivariate Analysis</h3><p>scatter, violin, chi-square, correlation</p></div></div>
+<div class="g2">
+<div class="cbl"><div class="cblh"><div class="lbl">Scatter + Regression Line</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="cm"># Num vs Num with trend</span>
+<span class="va">sns</span>.<span class="fn">regplot</span>(data=<span class="va">df</span>,
+    x=<span class="st">'col_x'</span>, y=<span class="st">'col_y'</span>,
+    scatter_kws={<span class="st">'alpha'</span>:<span class="nm">.4</span>},
+    line_kws={<span class="st">'color'</span>:<span class="st">'red'</span>})
+<span class="va">plt</span>.<span class="fn">show</span>()
+<span class="cm"># Colour by group</span>
+<span class="va">sns</span>.<span class="fn">scatterplot</span>(data=<span class="va">df</span>,
+    x=<span class="st">'x'</span>, y=<span class="st">'y'</span>, hue=<span class="st">'group'</span>)
+<span class="va">plt</span>.<span class="fn">show</span>()</pre></div>
+<div class="cbl"><div class="cblh"><div class="lbl">Chi-Square (Cat vs Cat)</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="kw">from</span> <span class="va">scipy.stats</span> <span class="kw">import</span> <span class="va">chi2_contingency</span>
+<span class="va">ct</span> = <span class="va">pd</span>.<span class="fn">crosstab</span>(<span class="va">df</span>[<span class="st">'c1'</span>], <span class="va">df</span>[<span class="st">'c2'</span>])
+<span class="va">_</span>,<span class="va">p</span>,<span class="va">_</span>,<span class="va">_</span> = <span class="fn">chi2_contingency</span>(<span class="va">ct</span>)
+<span class="nb">print</span>(<span class="st">f"p={p:.4f}"</span>,
+    <span class="st">"Dependent✓"</span> <span class="kw">if</span> <span class="va">p</span>&lt;<span class="nm">.05</span> <span class="kw">else</span> <span class="st">"Independent✗"</span>)
+<span class="va">sns</span>.<span class="fn">heatmap</span>(<span class="va">ct</span>, annot=<span class="kw">True</span>, fmt=<span class="st">'d'</span>)
+<span class="va">plt</span>.<span class="fn">show</span>()</pre></div>
+</div></div>
+
+<div class="sec"><div class="sh"><div class="snum">06</div><div class="si"><h3>Outlier Detection</h3><p>IQR fences + Z-score</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">IQR fences + Z-score — flag, count, remove outliers</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="cm"># IQR method (per column)</span>
+<span class="kw">def</span> <span class="fn">iqr_flag</span>(<span class="va">df</span>, <span class="va">col</span>):
+    <span class="va">Q1</span>, <span class="va">Q3</span> = <span class="va">df</span>[<span class="va">col</span>].<span class="fn">quantile</span>([<span class="nm">.25</span>, <span class="nm">.75</span>])
+    <span class="va">IQR</span> = <span class="va">Q3</span> - <span class="va">Q1</span>
+    <span class="kw">return</span> (<span class="va">df</span>[<span class="va">col</span>] &lt; <span class="va">Q1</span>-<span class="nm">1.5</span>*<span class="va">IQR</span>) | (<span class="va">df</span>[<span class="va">col</span>] &gt; <span class="va">Q3</span>+<span class="nm">1.5</span>*<span class="va">IQR</span>)
+
+<span class="kw">for</span> <span class="va">col</span> <span class="kw">in</span> <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).columns:
+    <span class="va">n</span> = <span class="fn">iqr_flag</span>(<span class="va">df</span>, <span class="va">col</span>).<span class="fn">sum</span>()
+    <span class="nb">print</span>(<span class="st">f"{col}: {n} outliers ({n/len(df)*100:.1f}%)"</span>)
+
+<span class="cm"># Z-score: remove rows with |z| > 3</span>
+<span class="kw">from</span> <span class="va">scipy.stats</span> <span class="kw">import</span> <span class="va">zscore</span>
+<span class="va">z</span> = <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).<span class="fn">apply</span>(<span class="va">zscore</span>)
+<span class="va">df_clean</span> = <span class="va">df</span>[(<span class="va">z</span>.<span class="fn">abs</span>() &lt; <span class="nm">3</span>).<span class="fn">all</span>(axis=<span class="nm">1</span>)]
+<span class="nb">print</span>(<span class="st">f"Kept {len(df_clean)}/{len(df)} rows"</span>)</pre></div></div>
+</div><!-- end eda-inter -->
+
+<!-- EDA ADVANCED -->
+<div class="lsec" id="eda-adv">
+<div class="ldiv"><div class="lline"></div><div class="lpill pa">Advanced EDA</div><div class="lline"></div></div>
+<div class="note danger">🔬 Advanced EDA: PCA, UMAP, VIF multicollinearity, Isolation Forest, automated reports, memory optimisation.</div>
+
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Memory Optimisation</h3><p>downcast dtypes, categorise strings</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">Auto-reduce memory — downcast all numeric + categorise low-cardinality</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">def</span> <span class="fn">reduce_memory</span>(<span class="va">df</span>):
+    <span class="va">before</span> = <span class="va">df</span>.<span class="fn">memory_usage</span>(deep=<span class="kw">True</span>).<span class="fn">sum</span>() / <span class="nm">1e6</span>
+    <span class="kw">for</span> <span class="va">col</span> <span class="kw">in</span> <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'int'</span>).columns:
+        <span class="va">df</span>[<span class="va">col</span>] = <span class="va">pd</span>.<span class="fn">to_numeric</span>(<span class="va">df</span>[<span class="va">col</span>], downcast=<span class="st">'integer'</span>)
+    <span class="kw">for</span> <span class="va">col</span> <span class="kw">in</span> <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'float'</span>).columns:
+        <span class="va">df</span>[<span class="va">col</span>] = <span class="va">pd</span>.<span class="fn">to_numeric</span>(<span class="va">df</span>[<span class="va">col</span>], downcast=<span class="st">'float'</span>)
+    <span class="kw">for</span> <span class="va">col</span> <span class="kw">in</span> <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'object'</span>).columns:
+        <span class="kw">if</span> <span class="va">df</span>[<span class="va">col</span>].<span class="fn">nunique</span>() / <span class="nb">len</span>(<span class="va">df</span>) &lt; <span class="nm">0.5</span>:
+            <span class="va">df</span>[<span class="va">col</span>] = <span class="va">df</span>[<span class="va">col</span>].<span class="fn">astype</span>(<span class="st">'category'</span>)
+    <span class="va">after</span> = <span class="va">df</span>.<span class="fn">memory_usage</span>(deep=<span class="kw">True</span>).<span class="fn">sum</span>() / <span class="nm">1e6</span>
+    <span class="nb">print</span>(<span class="st">f"{before:.2f} MB → {after:.2f} MB ({(1-after/before)*100:.0f}% saved)"</span>)
+    <span class="kw">return</span> <span class="va">df</span>
+
+<span class="va">df</span> = <span class="fn">reduce_memory</span>(<span class="va">df</span>)</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>PCA — Dimensionality Reduction</h3><p>scree plot + 2D projection</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">PCA variance explained scree + 2D scatter</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">sklearn.preprocessing</span> <span class="kw">import</span> <span class="va">StandardScaler</span>
+<span class="kw">from</span> <span class="va">sklearn.decomposition</span> <span class="kw">import</span> <span class="va">PCA</span>
+
+<span class="va">X</span> = <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).<span class="fn">dropna</span>()
+<span class="va">X_sc</span> = <span class="va">StandardScaler</span>().<span class="fn">fit_transform</span>(<span class="va">X</span>)
+
+<span class="cm"># Scree plot</span>
+<span class="va">pca</span> = <span class="va">PCA</span>().<span class="fn">fit</span>(<span class="va">X_sc</span>)
+<span class="va">cum</span> = <span class="va">np</span>.<span class="fn">cumsum</span>(<span class="va">pca</span>.explained_variance_ratio_) * <span class="nm">100</span>
+<span class="va">plt</span>.<span class="fn">bar</span>(<span class="nb">range</span>(<span class="nm">1</span>,<span class="nb">len</span>(<span class="va">cum</span>)+<span class="nm">1</span>), <span class="va">pca</span>.explained_variance_ratio_*<span class="nm">100</span>, alpha=<span class="nm">.6</span>)
+<span class="va">plt</span>.<span class="fn">plot</span>(<span class="nb">range</span>(<span class="nm">1</span>,<span class="nb">len</span>(<span class="va">cum</span>)+<span class="nm">1</span>), <span class="va">cum</span>, <span class="st">'ro-'</span>)
+<span class="va">plt</span>.<span class="fn">axhline</span>(<span class="nm">95</span>, color=<span class="st">'green'</span>, ls=<span class="st">'--'</span>, label=<span class="st">'95%'</span>)
+<span class="va">plt</span>.<span class="fn">xlabel</span>(<span class="st">'Component'</span>); <span class="va">plt</span>.<span class="fn">ylabel</span>(<span class="st">'Variance %'</span>); <span class="va">plt</span>.<span class="fn">show</span>()
+
+<span class="cm"># 2D projection</span>
+<span class="va">comp</span> = <span class="va">PCA</span>(<span class="nm">2</span>).<span class="fn">fit_transform</span>(<span class="va">X_sc</span>)
+<span class="va">plt</span>.<span class="fn">scatter</span>(<span class="va">comp</span>[:,<span class="nm">0</span>], <span class="va">comp</span>[:,<span class="nm">1</span>], alpha=<span class="nm">.4</span>, s=<span class="nm">10</span>)
+<span class="va">plt</span>.<span class="fn">xlabel</span>(<span class="st">'PC1'</span>); <span class="va">plt</span>.<span class="fn">ylabel</span>(<span class="st">'PC2'</span>); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">03</div><div class="si"><h3>VIF — Multicollinearity</h3><p>variance inflation factor</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">VIF per feature — VIF&gt;10 = severe multicollinearity</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">statsmodels.stats.outliers_influence</span> <span class="kw">import</span> <span class="va">variance_inflation_factor</span>
+
+<span class="va">X</span> = <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).<span class="fn">dropna</span>()
+<span class="va">vif</span> = <span class="va">pd</span>.<span class="fn">DataFrame</span>({
+    <span class="st">'Feature'</span>: <span class="va">X</span>.columns,
+    <span class="st">'VIF'</span>: [<span class="fn">variance_inflation_factor</span>(<span class="va">X</span>.values, <span class="va">i</span>)
+            <span class="kw">for</span> <span class="va">i</span> <span class="kw">in</span> <span class="nb">range</span>(<span class="va">X</span>.shape[<span class="nm">1</span>])]
+}).<span class="fn">sort_values</span>(<span class="st">'VIF'</span>, ascending=<span class="kw">False</span>)
+<span class="nb">print</span>(<span class="va">vif</span>)
+<span class="cm"># &lt;5=OK  5-10=moderate  &gt;10=severe → drop or combine</span></pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">04</div><div class="si"><h3>Isolation Forest + UMAP</h3><p>ML outlier detection + visual</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">Isolation Forest flags anomalies; UMAP shows them in 2D</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">sklearn.ensemble</span> <span class="kw">import</span> <span class="va">IsolationForest</span>
+
+<span class="va">X_sc</span> = <span class="va">StandardScaler</span>().<span class="fn">fit_transform</span>(<span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).<span class="fn">dropna</span>())
+<span class="va">iso</span> = <span class="va">IsolationForest</span>(contamination=<span class="nm">0.05</span>, random_state=<span class="nm">42</span>)
+<span class="va">df</span>[<span class="st">'anomaly'</span>] = <span class="va">iso</span>.<span class="fn">fit_predict</span>(<span class="va">X_sc</span>)  <span class="cm"># -1=outlier, 1=inlier</span>
+<span class="nb">print</span>(<span class="va">df</span>[<span class="st">'anomaly'</span>].<span class="fn">value_counts</span>())
+
+<span class="cm"># UMAP visualisation  (pip install umap-learn)</span>
+<span class="kw">import</span> <span class="va">umap</span>
+<span class="va">emb</span> = <span class="va">umap</span>.<span class="fn">UMAP</span>(n_components=<span class="nm">2</span>, random_state=<span class="nm">42</span>).<span class="fn">fit_transform</span>(<span class="va">X_sc</span>)
+<span class="va">plt</span>.<span class="fn">scatter</span>(*<span class="va">emb</span>.T,
+    c=<span class="va">df</span>[<span class="st">'anomaly'</span>].<span class="fn">map</span>({<span class="nm">1</span>:<span class="st">'steelblue'</span>,<span class="nm">-1</span>:<span class="st">'red'</span>}), alpha=<span class="nm">.5</span>, s=<span class="nm">8</span>)
+<span class="va">plt</span>.<span class="fn">title</span>(<span class="st">'UMAP + Isolation Forest (red=anomaly)'</span>); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">05</div><div class="si"><h3>Automated EDA Reports</h3><p>ydata-profiling, sweetviz</p></div></div>
+<div class="g2">
+<div class="cbl"><div class="cblh"><div class="lbl">ydata-profiling</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="kw">from</span> <span class="va">ydata_profiling</span> <span class="kw">import</span> <span class="va">ProfileReport</span>
+<span class="va">profile</span> = <span class="va">ProfileReport</span>(
+    <span class="va">df</span>, title=<span class="st">"EDA Report"</span>,
+    explorative=<span class="kw">True</span>)
+<span class="va">profile</span>.<span class="fn">to_file</span>(<span class="st">"eda_report.html"</span>)
+<span class="cm"># Jupyter notebook:</span>
+<span class="va">profile</span>.<span class="fn">to_notebook_iframe</span>()</pre></div>
+<div class="cbl"><div class="cblh"><div class="lbl">Sweetviz Compare</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="kw">import</span> <span class="va">sweetviz</span> <span class="kw">as</span> <span class="va">sv</span>
+<span class="cm"># Single dataset</span>
+<span class="va">sv</span>.<span class="fn">analyze</span>(<span class="va">df</span>, target_feat=<span class="st">'target'</span>
+    ).<span class="fn">show_html</span>(<span class="st">'sv.html'</span>)
+<span class="cm"># Train vs Test compare</span>
+<span class="va">sv</span>.<span class="fn">compare</span>(
+    [<span class="va">train</span>,<span class="st">"Train"</span>],[<span class="va">test</span>,<span class="st">"Test"</span>]
+).<span class="fn">show_html</span>(<span class="st">'cmp.html'</span>)</pre></div>
+</div></div>
+</div><!-- end eda-adv -->
+</div><!-- end page-eda -->
+<!-- ══ INFERENTIAL PAGE ══ -->
+<div class="apage" id="page-inf">
+<div class="ph"><div class="ptag" style="color:var(--inf)">// Inferential Analysis</div><h2 style="color:var(--inf)">Draw Conclusions<br>From Samples</h2><p>Hypothesis tests, confidence intervals, ANOVA, effect sizes — statistically valid claims from sample data.</p></div>
+
+<div class="lsec active" id="inf-basic">
+<div class="ldiv"><div class="lline"></div><div class="lpill pb">Basic</div><div class="lline"></div></div>
+<div class="note info">💡 Always check: sample size, normality (Shapiro), equal variance (Levene) before picking a test.</div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Imports</h3><p>scipy.stats, statsmodels</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inf)"></div><div class="clbl">Full inferential stats import block</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">scipy.stats</span> <span class="kw">import</span> (
+    <span class="va">ttest_1samp</span>, <span class="va">ttest_ind</span>, <span class="va">ttest_rel</span>,
+    <span class="va">mannwhitneyu</span>, <span class="va">wilcoxon</span>, <span class="va">kruskal</span>, <span class="va">f_oneway</span>,
+    <span class="va">chi2_contingency</span>, <span class="va">pearsonr</span>, <span class="va">spearmanr</span>,
+    <span class="va">shapiro</span>, <span class="va">levene</span>, <span class="va">sem</span>
+)
+<span class="kw">import</span> <span class="va">statsmodels.api</span> <span class="kw">as</span> <span class="va">sm</span>
+<span class="kw">import</span> <span class="va">statsmodels.formula.api</span> <span class="kw">as</span> <span class="va">smf</span>
+<span class="kw">from</span> <span class="va">scipy</span> <span class="kw">import</span> <span class="va">stats</span></pre></div></div>
+
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>t-Tests</h3><p>one-sample, two-sample, paired</p></div></div>
+<div class="g2">
+<div class="cbl"><div class="cblh"><div class="lbl">One-Sample &amp; Paired</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="cm"># One-sample: is mean == value?</span>
+<span class="va">t</span>,<span class="va">p</span> = <span class="fn">ttest_1samp</span>(
+    <span class="va">df</span>[<span class="st">'col'</span>].<span class="fn">dropna</span>(), popmean=<span class="nm">50</span>)
+<span class="nb">print</span>(<span class="st">f"t={t:.3f} p={p:.4f}"</span>)
+<span class="nb">print</span>(<span class="st">"Reject H0"</span> <span class="kw">if</span> <span class="va">p</span>&lt;<span class="nm">.05</span> <span class="kw">else</span> <span class="st">"Fail"</span>)
+<span class="cm"># Paired: before vs after</span>
+<span class="va">t</span>,<span class="va">p</span> = <span class="fn">ttest_rel</span>(<span class="va">df</span>[<span class="st">'before'</span>],<span class="va">df</span>[<span class="st">'after'</span>])
+<span class="nb">print</span>(<span class="st">f"t={t:.3f} p={p:.4f}"</span>)</pre></div>
+<div class="cbl"><div class="cblh"><div class="lbl">Two-Sample (Welch)</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="va">a</span> = <span class="va">df</span>[<span class="va">df</span>[<span class="st">'group'</span>]==<span class="st">'A'</span>][<span class="st">'val'</span>]
+<span class="va">b</span> = <span class="va">df</span>[<span class="va">df</span>[<span class="st">'group'</span>]==<span class="st">'B'</span>][<span class="st">'val'</span>]
+<span class="cm"># Welch (unequal variance)</span>
+<span class="va">t</span>,<span class="va">p</span> = <span class="fn">ttest_ind</span>(<span class="va">a</span>,<span class="va">b</span>, equal_var=<span class="kw">False</span>)
+<span class="nb">print</span>(<span class="st">f"t={t:.3f} p={p:.4f}"</span>)
+<span class="cm"># Check variance equality first</span>
+<span class="va">_</span>,<span class="va">pv</span> = <span class="fn">levene</span>(<span class="va">a</span>,<span class="va">b</span>)
+<span class="nb">print</span>(<span class="st">f"Levene p={pv:.4f}"</span>)</pre></div>
+</div></div>
+<div class="sec"><div class="sh"><div class="snum">03</div><div class="si"><h3>Correlation Tests</h3><p>Pearson, Spearman</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inf)"></div><div class="clbl">Linear and rank-based correlation with p-values</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="cm"># Pearson — linear relationship, assumes normality</span>
+<span class="va">r</span>,<span class="va">p</span> = <span class="fn">pearsonr</span>(<span class="va">df</span>[<span class="st">'x'</span>], <span class="va">df</span>[<span class="st">'y'</span>])
+<span class="nb">print</span>(<span class="st">f"Pearson  r={r:.3f}  p={p:.4f}"</span>)
+<span class="cm"># Spearman — monotonic / ordinal / non-normal</span>
+<span class="va">rho</span>,<span class="va">p</span> = <span class="fn">spearmanr</span>(<span class="va">df</span>[<span class="st">'x'</span>], <span class="va">df</span>[<span class="st">'y'</span>])
+<span class="nb">print</span>(<span class="st">f"Spearman rho={rho:.3f}  p={p:.4f}"</span>)</pre></div></div>
+</div><!-- inf-basic -->
+
+<div class="lsec" id="inf-inter">
+<div class="ldiv"><div class="lline"></div><div class="lpill pi">Intermediate</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>ANOVA + Tukey Post-Hoc</h3><p>compare 3+ group means</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">One-Way ANOVA then Tukey HSD to find which pairs differ</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">statsmodels.stats.multicomp</span> <span class="kw">import</span> <span class="va">pairwise_tukeyhsd</span>
+<span class="va">groups</span> = [<span class="va">g</span>[<span class="st">'value'</span>] <span class="kw">for</span> <span class="va">_</span>,<span class="va">g</span> <span class="kw">in</span> <span class="va">df</span>.<span class="fn">groupby</span>(<span class="st">'group'</span>)]
+<span class="va">F</span>,<span class="va">p</span> = <span class="fn">f_oneway</span>(*<span class="va">groups</span>)
+<span class="nb">print</span>(<span class="st">f"ANOVA: F={F:.3f} p={p:.4f}"</span>)
+<span class="kw">if</span> <span class="va">p</span> &lt; <span class="nm">0.05</span>:
+    <span class="va">tukey</span> = <span class="fn">pairwise_tukeyhsd</span>(<span class="va">df</span>[<span class="st">'value'</span>], <span class="va">df</span>[<span class="st">'group'</span>], alpha=<span class="nm">0.05</span>)
+    <span class="nb">print</span>(<span class="va">tukey</span>); <span class="va">tukey</span>.<span class="fn">plot_simultaneous</span>(); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Non-Parametric Tests</h3><p>when normality fails</p></div></div>
+<div class="g2">
+<div class="cbl"><div class="cblh"><div class="lbl">Mann-Whitney U (2 groups)</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="va">stat</span>,<span class="va">p</span> = <span class="fn">mannwhitneyu</span>(
+    <span class="va">df</span>[<span class="va">df</span>[<span class="st">'g'</span>]==<span class="st">'A'</span>][<span class="st">'val'</span>],
+    <span class="va">df</span>[<span class="va">df</span>[<span class="st">'g'</span>]==<span class="st">'B'</span>][<span class="st">'val'</span>],
+    alternative=<span class="st">'two-sided'</span>)
+<span class="nb">print</span>(<span class="st">f"U={stat} p={p:.4f}"</span>)</pre></div>
+<div class="cbl"><div class="cblh"><div class="lbl">Kruskal-Wallis (3+ groups)</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="cm"># Non-parametric ANOVA</span>
+<span class="va">groups</span> = [<span class="va">g</span>[<span class="st">'val'</span>] <span class="kw">for</span> <span class="va">_</span>,<span class="va">g</span>
+    <span class="kw">in</span> <span class="va">df</span>.<span class="fn">groupby</span>(<span class="st">'group'</span>)]
+<span class="va">H</span>,<span class="va">p</span> = <span class="fn">kruskal</span>(*<span class="va">groups</span>)
+<span class="nb">print</span>(<span class="st">f"H={H:.3f} p={p:.4f}"</span>)</pre></div>
+</div></div>
+<div class="sec"><div class="sh"><div class="snum">03</div><div class="si"><h3>Confidence Intervals</h3><p>t-distribution + bootstrap</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">95% CI via t-distribution and bootstrap resampling</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">data</span> = <span class="va">df</span>[<span class="st">'col'</span>].<span class="fn">dropna</span>()
+<span class="cm"># t-distribution CI</span>
+<span class="va">ci</span> = <span class="va">stats</span>.<span class="fn">t</span>.<span class="fn">interval</span>(confidence=<span class="nm">0.95</span>, df=<span class="nb">len</span>(<span class="va">data</span>)-<span class="nm">1</span>,
+    loc=<span class="va">data</span>.<span class="fn">mean</span>(), scale=<span class="fn">sem</span>(<span class="va">data</span>))
+<span class="nb">print</span>(<span class="st">f"95% CI: {ci[0]:.3f} – {ci[1]:.3f}"</span>)
+<span class="cm"># Bootstrap CI (5000 resamples)</span>
+<span class="va">boot</span> = [<span class="va">np</span>.<span class="fn">random</span>.<span class="fn">choice</span>(<span class="va">data</span>,<span class="nb">len</span>(<span class="va">data</span>),replace=<span class="kw">True</span>).<span class="fn">mean</span>()
+        <span class="kw">for</span> <span class="va">_</span> <span class="kw">in</span> <span class="nb">range</span>(<span class="nm">5000</span>)]
+<span class="va">lo</span>,<span class="va">hi</span> = <span class="va">np</span>.<span class="fn">percentile</span>(<span class="va">boot</span>,[<span class="nm">2.5</span>,<span class="nm">97.5</span>])
+<span class="nb">print</span>(<span class="st">f"Bootstrap 95% CI: {lo:.3f} – {hi:.3f}"</span>)</pre></div></div>
+</div><!-- inf-inter -->
+
+<div class="lsec" id="inf-adv">
+<div class="ldiv"><div class="lline"></div><div class="lpill pa">Advanced</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>OLS Regression</h3><p>statsmodels formula API + diagnostics</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">Full OLS summary + residual diagnostic plots</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">model</span> = <span class="va">smf</span>.<span class="fn">ols</span>(<span class="st">'y ~ x1 + x2 + C(cat_col)'</span>, data=<span class="va">df</span>).<span class="fn">fit</span>()
+<span class="nb">print</span>(<span class="va">model</span>.<span class="fn">summary</span>())
+<span class="nb">print</span>(<span class="st">"R²:"</span>, <span class="va">model</span>.rsquared.<span class="fn">round</span>(<span class="nm">4</span>))
+<span class="nb">print</span>(<span class="st">"AIC:"</span>, <span class="va">model</span>.aic.<span class="fn">round</span>(<span class="nm">2</span>))
+<span class="cm"># Residual diagnostics</span>
+<span class="va">fig</span>,<span class="va">ax</span> = <span class="va">plt</span>.<span class="fn">subplots</span>(<span class="nm">1</span>,<span class="nm">2</span>,figsize=(<span class="nm">12</span>,<span class="nm">4</span>))
+<span class="va">ax</span>[<span class="nm">0</span>].<span class="fn">scatter</span>(<span class="va">model</span>.fittedvalues, <span class="va">model</span>.resid, alpha=<span class="nm">.4</span>)
+<span class="va">ax</span>[<span class="nm">0</span>].<span class="fn">axhline</span>(<span class="nm">0</span>,color=<span class="st">'red'</span>,ls=<span class="st">'--'</span>)
+<span class="va">ax</span>[<span class="nm">0</span>].<span class="fn">set_xlabel</span>(<span class="st">'Fitted'</span>); <span class="va">ax</span>[<span class="nm">0</span>].<span class="fn">set_ylabel</span>(<span class="st">'Residuals'</span>)
+<span class="va">sm</span>.<span class="fn">qqplot</span>(<span class="va">model</span>.resid, line=<span class="st">'s'</span>, ax=<span class="va">ax</span>[<span class="nm">1</span>])
+<span class="va">plt</span>.<span class="fn">tight_layout</span>(); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Effect Size &amp; Power</h3><p>Cohen's d, minimum sample size</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">Cohen's d + required n for 80% power</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">statsmodels.stats.power</span> <span class="kw">import</span> <span class="va">TTestIndPower</span>
+<span class="kw">def</span> <span class="fn">cohens_d</span>(<span class="va">a</span>,<span class="va">b</span>):
+    <span class="kw">return</span> <span class="nb">abs</span>(<span class="va">a</span>.<span class="fn">mean</span>()-<span class="va">b</span>.<span class="fn">mean</span>()) / <span class="va">np</span>.<span class="fn">sqrt</span>((<span class="va">a</span>.<span class="fn">std</span>()**<span class="nm">2</span>+<span class="va">b</span>.<span class="fn">std</span>()**<span class="nm">2</span>)/<span class="nm">2</span>)
+<span class="va">d</span> = <span class="fn">cohens_d</span>(<span class="va">df</span>[<span class="st">'g_a'</span>],<span class="va">df</span>[<span class="st">'g_b'</span>])
+<span class="nb">print</span>(<span class="st">f"Cohen's d={d:.3f}"</span>) <span class="cm"># 0.2=small 0.5=med 0.8=large</span>
+<span class="va">n</span> = <span class="va">TTestIndPower</span>().<span class="fn">solve_power</span>(
+    effect_size=<span class="va">d</span>, alpha=<span class="nm">0.05</span>, power=<span class="nm">0.80</span>)
+<span class="nb">print</span>(<span class="st">f"Required n per group: {n:.0f}"</span>)</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">03</div><div class="si"><h3>Multiple Testing Correction</h3><p>Bonferroni, BH FDR</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">Correct p-values when running many hypothesis tests</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">statsmodels.stats.multitest</span> <span class="kw">import</span> <span class="va">multipletests</span>
+<span class="va">p_vals</span> = [<span class="nm">0.001</span>,<span class="nm">0.04</span>,<span class="nm">0.06</span>,<span class="nm">0.002</span>,<span class="nm">0.08</span>]
+<span class="va">_</span>,<span class="va">p_bonf</span>,<span class="va">_</span>,<span class="va">_</span> = <span class="fn">multipletests</span>(<span class="va">p_vals</span>, method=<span class="st">'bonferroni'</span>)
+<span class="va">rej_bh</span>,<span class="va">p_bh</span>,<span class="va">_</span>,<span class="va">_</span> = <span class="fn">multipletests</span>(<span class="va">p_vals</span>, method=<span class="st">'fdr_bh'</span>)
+<span class="nb">print</span>(<span class="va">pd</span>.<span class="fn">DataFrame</span>({<span class="st">'orig'</span>:<span class="va">p_vals</span>,
+    <span class="st">'bonferroni'</span>:<span class="va">p_bonf</span>.<span class="fn">round</span>(<span class="nm">4</span>),
+    <span class="st">'BH_fdr'</span>:<span class="va">p_bh</span>.<span class="fn">round</span>(<span class="nm">4</span>),<span class="st">'reject'</span>:<span class="va">rej_bh</span>}))</pre></div></div>
+</div><!-- inf-adv -->
+</div><!-- page-inf -->
+
+<!-- ══ CLUSTER PAGE ══ -->
+<div class="apage" id="page-clu">
+<div class="ph"><div class="ptag" style="color:var(--clu)">// Cluster Analysis</div><h2 style="color:var(--clu)">Find Natural<br>Groupings</h2><p>K-Means, DBSCAN, hierarchical, GMM — unsupervised segmentation for hidden structure.</p></div>
+
+<div class="lsec active" id="clu-basic">
+<div class="ldiv"><div class="lline"></div><div class="lpill pb">Basic</div><div class="lline"></div></div>
+<div class="note info">💡 Always StandardScale first — clustering is distance-based, so units matter hugely.</div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Setup &amp; K-Means</h3><p>scale, elbow method, fit</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--clu)"></div><div class="clbl">Scale → elbow → fit K-Means → label</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">sklearn.preprocessing</span> <span class="kw">import</span> <span class="va">StandardScaler</span>
+<span class="kw">from</span> <span class="va">sklearn.cluster</span> <span class="kw">import</span> <span class="va">KMeans</span>
+
+<span class="va">X</span> = <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).<span class="fn">dropna</span>()
+<span class="va">X_sc</span> = <span class="va">StandardScaler</span>().<span class="fn">fit_transform</span>(<span class="va">X</span>)
+
+<span class="cm"># Elbow method</span>
+<span class="va">inertias</span> = [<span class="va">KMeans</span>(<span class="va">k</span>, random_state=<span class="nm">42</span>, n_init=<span class="nm">10</span>).<span class="fn">fit</span>(<span class="va">X_sc</span>).inertia_
+            <span class="kw">for</span> <span class="va">k</span> <span class="kw">in</span> <span class="nb">range</span>(<span class="nm">1</span>,<span class="nm">11</span>)]
+<span class="va">plt</span>.<span class="fn">plot</span>(<span class="nb">range</span>(<span class="nm">1</span>,<span class="nm">11</span>), <span class="va">inertias</span>, <span class="st">'bo-'</span>)
+<span class="va">plt</span>.<span class="fn">xlabel</span>(<span class="st">'k'</span>); <span class="va">plt</span>.<span class="fn">title</span>(<span class="st">'Elbow Method'</span>); <span class="va">plt</span>.<span class="fn">show</span>()
+
+<span class="cm"># Fit chosen k</span>
+<span class="va">km</span> = <span class="va">KMeans</span>(n_clusters=<span class="nm">4</span>, random_state=<span class="nm">42</span>, n_init=<span class="nm">10</span>)
+<span class="va">df</span>[<span class="st">'cluster'</span>] = <span class="va">km</span>.<span class="fn">fit_predict</span>(<span class="va">X_sc</span>)
+<span class="nb">print</span>(<span class="va">df</span>[<span class="st">'cluster'</span>].<span class="fn">value_counts</span>())</pre></div></div>
+</div><!-- clu-basic -->
+
+<div class="lsec" id="clu-inter">
+<div class="ldiv"><div class="lline"></div><div class="lpill pi">Intermediate</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Evaluate + DBSCAN</h3><p>silhouette score, density clustering</p></div></div>
+<div class="g2">
+<div class="cbl"><div class="cblh"><div class="lbl">Silhouette Sweep</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="kw">from</span> <span class="va">sklearn.metrics</span> <span class="kw">import</span> <span class="va">silhouette_score</span>
+<span class="va">scores</span> = {}
+<span class="kw">for</span> <span class="va">k</span> <span class="kw">in</span> <span class="nb">range</span>(<span class="nm">2</span>,<span class="nm">11</span>):
+    <span class="va">lbl</span> = <span class="va">KMeans</span>(<span class="va">k</span>,random_state=<span class="nm">42</span>,
+        n_init=<span class="nm">10</span>).<span class="fn">fit_predict</span>(<span class="va">X_sc</span>)
+    <span class="va">scores</span>[<span class="va">k</span>] = <span class="fn">silhouette_score</span>(<span class="va">X_sc</span>,<span class="va">lbl</span>)
+<span class="va">best_k</span> = <span class="nb">max</span>(<span class="va">scores</span>,key=<span class="va">scores</span>.<span class="fn">get</span>)
+<span class="nb">print</span>(<span class="st">f"Best k={best_k} sil={scores[best_k]:.3f}"</span>)</pre></div>
+<div class="cbl"><div class="cblh"><div class="lbl">DBSCAN</div><button class="cpb" onclick="cp(this)">COPY</button></div>
+<pre><span class="kw">from</span> <span class="va">sklearn.cluster</span> <span class="kw">import</span> <span class="va">DBSCAN</span>
+<span class="va">db</span> = <span class="va">DBSCAN</span>(
+    eps=<span class="nm">0.5</span>,      <span class="cm"># neighbourhood radius</span>
+    min_samples=<span class="nm">5</span> <span class="cm"># core point threshold</span>
+)
+<span class="va">df</span>[<span class="st">'cluster_db'</span>] = <span class="va">db</span>.<span class="fn">fit_predict</span>(<span class="va">X_sc</span>)
+<span class="cm"># -1 = noise / outlier</span>
+<span class="nb">print</span>(<span class="va">df</span>[<span class="st">'cluster_db'</span>].<span class="fn">value_counts</span>())</pre></div>
+</div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Hierarchical + Profile Heatmap</h3><p>dendrogram, cluster means</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">Ward dendrogram + Z-scored cluster profile heatmap</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">scipy.cluster.hierarchy</span> <span class="kw">import</span> <span class="va">dendrogram</span>, <span class="va">linkage</span>, <span class="va">fcluster</span>
+<span class="va">Z</span> = <span class="fn">linkage</span>(<span class="va">X_sc</span>, method=<span class="st">'ward'</span>)
+<span class="va">plt</span>.<span class="fn">figure</span>(figsize=(<span class="nm">12</span>,<span class="nm">5</span>)); <span class="fn">dendrogram</span>(<span class="va">Z</span>, truncate_mode=<span class="st">'lastp'</span>, p=<span class="nm">20</span>)
+<span class="va">plt</span>.<span class="fn">title</span>(<span class="st">'Hierarchical Dendrogram'</span>); <span class="va">plt</span>.<span class="fn">show</span>()
+<span class="va">df</span>[<span class="st">'cluster_hc'</span>] = <span class="fn">fcluster</span>(<span class="va">Z</span>, t=<span class="nm">4</span>, criterion=<span class="st">'maxclust'</span>)
+
+<span class="cm"># Profile heatmap</span>
+<span class="va">num_cols</span> = <span class="va">df</span>.<span class="fn">select_dtypes</span>(<span class="st">'number'</span>).columns
+<span class="va">prof</span> = <span class="va">df</span>.<span class="fn">groupby</span>(<span class="st">'cluster'</span>)[<span class="va">num_cols</span>].<span class="fn">mean</span>()
+<span class="va">prof_z</span> = (<span class="va">prof</span>-<span class="va">prof</span>.<span class="fn">mean</span>())/<span class="va">prof</span>.<span class="fn">std</span>()
+<span class="va">sns</span>.<span class="fn">heatmap</span>(<span class="va">prof_z</span>, annot=<span class="kw">True</span>, fmt=<span class="st">'.2f'</span>, cmap=<span class="st">'RdYlGn'</span>, center=<span class="nm">0</span>)
+<span class="va">plt</span>.<span class="fn">title</span>(<span class="st">'Cluster Profiles (Z-score)'</span>); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+</div><!-- clu-inter -->
+
+<div class="lsec" id="clu-adv">
+<div class="ldiv"><div class="lline"></div><div class="lpill pa">Advanced</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Gaussian Mixture Models</h3><p>soft clustering, BIC selection</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">GMM BIC selection + soft membership probabilities</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">sklearn.mixture</span> <span class="kw">import</span> <span class="va">GaussianMixture</span>
+<span class="va">bics</span> = [<span class="va">GaussianMixture</span>(<span class="va">k</span>,random_state=<span class="nm">42</span>).<span class="fn">fit</span>(<span class="va">X_sc</span>).<span class="fn">bic</span>(<span class="va">X_sc</span>)
+        <span class="kw">for</span> <span class="va">k</span> <span class="kw">in</span> <span class="nb">range</span>(<span class="nm">1</span>,<span class="nm">10</span>)]
+<span class="va">best_k</span> = <span class="va">np</span>.<span class="fn">argmin</span>(<span class="va">bics</span>)+<span class="nm">1</span>
+<span class="nb">print</span>(<span class="st">f"Best k by BIC: {best_k}"</span>)
+<span class="va">gmm</span> = <span class="va">GaussianMixture</span>(<span class="va">best_k</span>, random_state=<span class="nm">42</span>).<span class="fn">fit</span>(<span class="va">X_sc</span>)
+<span class="va">df</span>[<span class="st">'cluster_gmm'</span>]  = <span class="va">gmm</span>.<span class="fn">predict</span>(<span class="va">X_sc</span>)
+<span class="va">df</span>[<span class="st">'cluster_prob'</span>] = <span class="va">gmm</span>.<span class="fn">predict_proba</span>(<span class="va">X_sc</span>).<span class="fn">max</span>(axis=<span class="nm">1</span>)</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>UMAP Visualisation</h3><p>2D non-linear embedding coloured by cluster</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">UMAP 2D projection + seaborn scatter coloured by label</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">import</span> <span class="va">umap</span>  <span class="cm"># pip install umap-learn</span>
+<span class="va">emb</span> = <span class="va">umap</span>.<span class="fn">UMAP</span>(n_components=<span class="nm">2</span>, random_state=<span class="nm">42</span>,
+    n_neighbors=<span class="nm">15</span>, min_dist=<span class="nm">0.1</span>).<span class="fn">fit_transform</span>(<span class="va">X_sc</span>)
+<span class="va">sns</span>.<span class="fn">scatterplot</span>(x=<span class="va">emb</span>[:,<span class="nm">0</span>], y=<span class="va">emb</span>[:,<span class="nm">1</span>],
+    hue=<span class="va">df</span>[<span class="st">'cluster'</span>].astype(<span class="nb">str</span>),
+    palette=<span class="st">'tab10'</span>, s=<span class="nm">15</span>, alpha=<span class="nm">.7</span>)
+<span class="va">plt</span>.<span class="fn">title</span>(<span class="st">'UMAP Cluster Visualisation'</span>); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+</div><!-- clu-adv -->
+</div><!-- page-clu -->
+
+<!-- ══ TIME SERIES PAGE ══ -->
+<div class="apage" id="page-ts">
+<div class="ph"><div class="ptag" style="color:var(--ts)">// Time Series Analysis</div><h2 style="color:var(--ts)">Patterns<br>Across Time</h2><p>Trend, seasonality, stationarity tests, ACF/PACF, ARIMA and Prophet forecasting.</p></div>
+
+<div class="lsec active" id="ts-basic">
+<div class="ldiv"><div class="lline"></div><div class="lpill pb">Basic</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Load &amp; Index by Date</h3><p>parse dates, resample</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--ts)"></div><div class="clbl">Load, set DatetimeIndex, resample to any frequency</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">df</span> = <span class="va">pd</span>.<span class="fn">read_csv</span>(<span class="st">'data.csv'</span>, parse_dates=[<span class="st">'date'</span>])
+<span class="va">df</span> = <span class="va">df</span>.<span class="fn">sort_values</span>(<span class="st">'date'</span>).<span class="fn">set_index</span>(<span class="st">'date'</span>)
+<span class="va">df</span>.<span class="fn">resample</span>(<span class="st">'D'</span>).<span class="fn">sum</span>()    <span class="cm"># daily sum</span>
+<span class="va">df</span>.<span class="fn">resample</span>(<span class="st">'W'</span>).<span class="fn">mean</span>()  <span class="cm"># weekly mean</span>
+<span class="va">df</span>.<span class="fn">resample</span>(<span class="st">'ME'</span>).<span class="fn">last</span>() <span class="cm"># month-end last</span>
+<span class="va">df</span>.<span class="fn">resample</span>(<span class="st">'QE'</span>).<span class="fn">sum</span>()  <span class="cm"># quarterly</span>
+<span class="va">df</span>[<span class="st">'value'</span>].<span class="fn">plot</span>(figsize=(<span class="nm">12</span>,<span class="nm">4</span>),title=<span class="st">'Time Series'</span>); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Rolling Statistics</h3><p>moving average, EWM, std band</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--ts)"></div><div class="clbl">7-day MA with ±1σ confidence band + EWM</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">s</span> = <span class="va">df</span>[<span class="st">'value'</span>]
+<span class="va">ma7</span>  = <span class="va">s</span>.<span class="fn">rolling</span>(<span class="nm">7</span>).<span class="fn">mean</span>()
+<span class="va">std7</span> = <span class="va">s</span>.<span class="fn">rolling</span>(<span class="nm">7</span>).<span class="fn">std</span>()
+<span class="va">plt</span>.<span class="fn">figure</span>(figsize=(<span class="nm">12</span>,<span class="nm">4</span>))
+<span class="va">s</span>.<span class="fn">plot</span>(alpha=<span class="nm">.3</span>, label=<span class="st">'Raw'</span>)
+<span class="va">ma7</span>.<span class="fn">plot</span>(label=<span class="st">'7-day MA'</span>, lw=<span class="nm">2</span>)
+<span class="va">plt</span>.<span class="fn">fill_between</span>(<span class="va">s</span>.index, <span class="va">ma7</span>-<span class="va">std7</span>, <span class="va">ma7</span>+<span class="va">std7</span>, alpha=<span class="nm">.15</span>)
+<span class="va">plt</span>.<span class="fn">legend</span>(); <span class="va">plt</span>.<span class="fn">show</span>()
+<span class="cm"># Exponentially weighted MA</span>
+<span class="va">s</span>.<span class="fn">ewm</span>(span=<span class="nm">7</span>).<span class="fn">mean</span>().<span class="fn">plot</span>(); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+</div><!-- ts-basic -->
+
+<div class="lsec" id="ts-inter">
+<div class="ldiv"><div class="lline"></div><div class="lpill pi">Intermediate</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Stationarity Tests + Decomposition</h3><p>ADF, KPSS, STL</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">ADF+KPSS stationarity + STL decomposition</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">statsmodels.tsa.stattools</span> <span class="kw">import</span> <span class="va">adfuller</span>, <span class="va">kpss</span>
+<span class="kw">from</span> <span class="va">statsmodels.tsa.seasonal</span> <span class="kw">import</span> <span class="va">STL</span>
+
+<span class="kw">def</span> <span class="fn">stationarity_check</span>(<span class="va">series</span>):
+    <span class="va">adf_p</span>  = <span class="fn">adfuller</span>(<span class="va">series</span>.<span class="fn">dropna</span>())[<span class="nm">1</span>]
+    <span class="va">kpss_p</span> = <span class="fn">kpss</span>(<span class="va">series</span>.<span class="fn">dropna</span>())[<span class="nm">1</span>]
+    <span class="nb">print</span>(<span class="st">f"ADF  p={adf_p:.4f}  {'Stationary✓' if adf_p&lt;0.05 else 'Non-stationary✗'}"</span>)
+    <span class="nb">print</span>(<span class="st">f"KPSS p={kpss_p:.4f}  {'Stationary✓' if kpss_p&gt;0.05 else 'Non-stationary✗'}"</span>)
+
+<span class="fn">stationarity_check</span>(<span class="va">df</span>[<span class="st">'value'</span>])
+<span class="cm"># Make stationary</span>
+<span class="va">df</span>[<span class="st">'diff1'</span>]   = <span class="va">df</span>[<span class="st">'value'</span>].<span class="fn">diff</span>()
+<span class="va">df</span>[<span class="st">'logdiff'</span>] = <span class="va">np</span>.<span class="fn">log</span>(<span class="va">df</span>[<span class="st">'value'</span>]).<span class="fn">diff</span>()
+
+<span class="cm"># STL decomposition</span>
+<span class="va">stl</span> = <span class="va">STL</span>(<span class="va">df</span>[<span class="st">'value'</span>], period=<span class="nm">12</span>).<span class="fn">fit</span>()
+<span class="va">stl</span>.<span class="fn">plot</span>(); <span class="va">plt</span>.<span class="fn">show</span>()
+<span class="va">df</span>[<span class="st">'trend'</span>]=<span class="va">stl</span>.trend; <span class="va">df</span>[<span class="st">'seasonal'</span>]=<span class="va">stl</span>.seasonal; <span class="va">df</span>[<span class="st">'resid'</span>]=<span class="va">stl</span>.resid</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>ACF &amp; PACF Plots</h3><p>identify AR and MA orders</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">ACF → q (MA order)  |  PACF → p (AR order)</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">statsmodels.graphics.tsaplots</span> <span class="kw">import</span> <span class="va">plot_acf</span>, <span class="va">plot_pacf</span>
+<span class="va">fig</span>, <span class="va">axes</span> = <span class="va">plt</span>.<span class="fn">subplots</span>(<span class="nm">1</span>,<span class="nm">2</span>,figsize=(<span class="nm">14</span>,<span class="nm">4</span>))
+<span class="fn">plot_acf</span>(<span class="va">df</span>[<span class="st">'value'</span>].<span class="fn">dropna</span>(), lags=<span class="nm">40</span>, ax=<span class="va">axes</span>[<span class="nm">0</span>])
+<span class="fn">plot_pacf</span>(<span class="va">df</span>[<span class="st">'value'</span>].<span class="fn">dropna</span>(), lags=<span class="nm">40</span>, ax=<span class="va">axes</span>[<span class="nm">1</span>])
+<span class="va">plt</span>.<span class="fn">tight_layout</span>(); <span class="va">plt</span>.<span class="fn">show</span>()
+<span class="cm"># ACF  → q (MA order): count significant lags</span>
+<span class="cm"># PACF → p (AR order): count significant lags</span></pre></div></div>
+</div><!-- ts-inter -->
+
+<div class="lsec" id="ts-adv">
+<div class="ldiv"><div class="lline"></div><div class="lpill pa">Advanced</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Auto-ARIMA + SARIMA Forecast</h3><p>auto order, 12-step forecast with CI</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">pmdarima auto_arima + SARIMA forecast with confidence band</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">pmdarima</span> <span class="kw">import</span> <span class="va">auto_arima</span>    <span class="cm"># pip install pmdarima</span>
+<span class="kw">from</span> <span class="va">statsmodels.tsa.statespace.sarimax</span> <span class="kw">import</span> <span class="va">SARIMAX</span>
+
+<span class="va">auto</span> = <span class="fn">auto_arima</span>(<span class="va">df</span>[<span class="st">'value'</span>], seasonal=<span class="kw">True</span>, m=<span class="nm">12</span>,
+    stepwise=<span class="kw">True</span>, suppress_warnings=<span class="kw">True</span>)
+<span class="nb">print</span>(<span class="st">f"Order:{auto.order}  Seasonal:{auto.seasonal_order}"</span>)
+
+<span class="va">model</span> = <span class="va">SARIMAX</span>(<span class="va">df</span>[<span class="st">'value'</span>],
+    order=<span class="va">auto</span>.order,
+    seasonal_order=<span class="va">auto</span>.seasonal_order).<span class="fn">fit</span>(disp=<span class="kw">False</span>)
+<span class="va">fc</span> = <span class="va">model</span>.<span class="fn">get_forecast</span>(steps=<span class="nm">12</span>)
+<span class="va">ci</span> = <span class="va">fc</span>.<span class="fn">conf_int</span>()
+<span class="va">plt</span>.<span class="fn">figure</span>(figsize=(<span class="nm">12</span>,<span class="nm">5</span>))
+<span class="va">df</span>[<span class="st">'value'</span>].<span class="fn">plot</span>(label=<span class="st">'Observed'</span>)
+<span class="va">fc</span>.<span class="fn">predicted_mean</span>.<span class="fn">plot</span>(label=<span class="st">'Forecast'</span>,style=<span class="st">'r--'</span>)
+<span class="va">plt</span>.<span class="fn">fill_between</span>(<span class="va">ci</span>.index,<span class="va">ci</span>.iloc[:,<span class="nm">0</span>],<span class="va">ci</span>.iloc[:,<span class="nm">1</span>],alpha=<span class="nm">.15</span>)
+<span class="va">plt</span>.<span class="fn">legend</span>(); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Prophet Forecasting</h3><p>trend + seasonality + changepoints</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">Prophet 90-day forecast with component breakdown</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">prophet</span> <span class="kw">import</span> <span class="va">Prophet</span>   <span class="cm"># pip install prophet</span>
+<span class="cm"># Requires columns: ds (date), y (value)</span>
+<span class="va">pf</span> = <span class="va">df</span>.<span class="fn">reset_index</span>().<span class="fn">rename</span>(columns={<span class="st">'date'</span>:<span class="st">'ds'</span>,<span class="st">'value'</span>:<span class="st">'y'</span>})
+<span class="va">m</span> = <span class="va">Prophet</span>(yearly_seasonality=<span class="kw">True</span>, weekly_seasonality=<span class="kw">True</span>,
+    changepoint_prior_scale=<span class="nm">0.05</span>)
+<span class="va">m</span>.<span class="fn">fit</span>(<span class="va">pf</span>)
+<span class="va">future</span> = <span class="va">m</span>.<span class="fn">make_future_dataframe</span>(periods=<span class="nm">90</span>)
+<span class="va">forecast</span> = <span class="va">m</span>.<span class="fn">predict</span>(<span class="va">future</span>)
+<span class="va">m</span>.<span class="fn">plot</span>(<span class="va">forecast</span>); <span class="va">plt</span>.<span class="fn">show</span>()
+<span class="va">m</span>.<span class="fn">plot_components</span>(<span class="va">forecast</span>); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+</div><!-- ts-adv -->
+</div><!-- page-ts -->
+
+<!-- ══ COHORT PAGE ══ -->
+<div class="apage" id="page-coh">
+<div class="ph"><div class="ptag" style="color:var(--coh)">// Cohort Analysis</div><h2 style="color:var(--coh)">Track Behaviour<br>Across Cohorts</h2><p>Group users by first event month — measure retention, LTV and survival probability over lifecycle periods.</p></div>
+
+<div class="lsec active" id="coh-basic">
+<div class="ldiv"><div class="lline"></div><div class="lpill pb">Basic</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Build Cohort Table</h3><p>cohort month, period index, pivot</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--coh)"></div><div class="clbl">Assign cohort month and period number, pivot to matrix</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="cm"># Required columns: user_id, order_date (datetime)</span>
+<span class="va">df</span>[<span class="st">'order_month'</span>] = <span class="va">df</span>[<span class="st">'order_date'</span>].<span class="fn">dt</span>.to_period(<span class="st">'M'</span>)
+<span class="cm"># First month each user appeared</span>
+<span class="va">df</span>[<span class="st">'cohort'</span>] = <span class="va">df</span>.<span class="fn">groupby</span>(<span class="st">'user_id'</span>)[<span class="st">'order_month'</span>].<span class="fn">transform</span>(<span class="st">'min'</span>)
+<span class="cm"># Months since first purchase</span>
+<span class="va">df</span>[<span class="st">'period'</span>] = (<span class="va">df</span>[<span class="st">'order_month'</span>]-<span class="va">df</span>[<span class="st">'cohort'</span>]).<span class="fn">apply</span>(<span class="kw">lambda</span> <span class="va">x</span>:<span class="va">x</span>.n)
+<span class="cm"># Pivot: rows=cohort, cols=period, values=unique users</span>
+<span class="va">pivot</span> = <span class="va">df</span>.<span class="fn">groupby</span>([<span class="st">'cohort'</span>,<span class="st">'period'</span>])[<span class="st">'user_id'</span>].\
+           <span class="fn">nunique</span>().<span class="fn">reset_index</span>().\
+           <span class="fn">pivot</span>(index=<span class="st">'cohort'</span>,columns=<span class="st">'period'</span>,values=<span class="st">'user_id'</span>)
+<span class="nb">print</span>(<span class="va">pivot</span>.<span class="fn">head</span>())</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Retention Rate Heatmap</h3><p>% of cohort retained per period</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--coh)"></div><div class="clbl">Retention % heatmap — the standard cohort chart</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">cohort_size</span> = <span class="va">pivot</span>.iloc[:, <span class="nm">0</span>]
+<span class="va">retention</span>   = <span class="va">pivot</span>.<span class="fn">divide</span>(<span class="va">cohort_size</span>, axis=<span class="nm">0</span>) * <span class="nm">100</span>
+<span class="va">plt</span>.<span class="fn">figure</span>(figsize=(<span class="nm">16</span>,<span class="nm">8</span>))
+<span class="va">sns</span>.<span class="fn">heatmap</span>(<span class="va">retention</span>, annot=<span class="kw">True</span>, fmt=<span class="st">'.0f'</span>,
+    cmap=<span class="st">'YlGnBu'</span>, vmin=<span class="nm">0</span>, vmax=<span class="nm">100</span>, linewidths=<span class="nm">.5</span>)
+<span class="va">plt</span>.<span class="fn">title</span>(<span class="st">'Cohort Retention Rate (%)'</span>)
+<span class="va">plt</span>.<span class="fn">ylabel</span>(<span class="st">'Cohort Month'</span>)
+<span class="va">plt</span>.<span class="fn">xlabel</span>(<span class="st">'Months Since First Purchase'</span>)
+<span class="va">plt</span>.<span class="fn">tight_layout</span>(); <span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+</div><!-- coh-basic -->
+
+<div class="lsec" id="coh-inter">
+<div class="ldiv"><div class="lline"></div><div class="lpill pi">Intermediate</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Revenue LTV per Cohort</h3><p>cumulative per-user LTV curves</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--inter)"></div><div class="clbl">Cumulative revenue per user — compare cohort LTV over time</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="va">rev_pivot</span> = <span class="va">df</span>.<span class="fn">groupby</span>([<span class="st">'cohort'</span>,<span class="st">'period'</span>])[<span class="st">'revenue'</span>].\
+              <span class="fn">sum</span>().<span class="fn">reset_index</span>().\
+              <span class="fn">pivot</span>(index=<span class="st">'cohort'</span>,columns=<span class="st">'period'</span>,values=<span class="st">'revenue'</span>)
+<span class="cm"># Per-user normalisation</span>
+<span class="va">ltv</span> = <span class="va">rev_pivot</span>.<span class="fn">divide</span>(<span class="va">cohort_size</span>, axis=<span class="nm">0</span>).<span class="fn">cumsum</span>(axis=<span class="nm">1</span>)
+<span class="va">ltv</span>.<span class="fn">T</span>.<span class="fn">plot</span>(figsize=(<span class="nm">12</span>,<span class="nm">5</span>),
+    title=<span class="st">'Cumulative LTV per User by Cohort'</span>, alpha=<span class="nm">.8</span>)
+<span class="va">plt</span>.<span class="fn">xlabel</span>(<span class="st">'Period (months)'</span>); <span class="va">plt</span>.<span class="fn">ylabel</span>(<span class="st">'Revenue / User'</span>)
+<span class="va">plt</span>.<span class="fn">show</span>()
+<span class="cm"># Average retention curve</span>
+<span class="va">retention</span>.<span class="fn">mean</span>().<span class="fn">plot</span>(marker=<span class="st">'o'</span>, title=<span class="st">'Avg Retention Curve'</span>)
+<span class="va">plt</span>.<span class="fn">show</span>()</pre></div></div>
+</div><!-- coh-inter -->
+
+<div class="lsec" id="coh-adv">
+<div class="ldiv"><div class="lline"></div><div class="lpill pa">Advanced</div><div class="lline"></div></div>
+<div class="sec"><div class="sh"><div class="snum">01</div><div class="si"><h3>Kaplan-Meier Survival Curve</h3><p>churn probability over time</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">KM curve + log-rank test to compare segments</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">lifelines</span> <span class="kw">import</span> <span class="va">KaplanMeierFitter</span>  <span class="cm"># pip install lifelines</span>
+<span class="kw">from</span> <span class="va">lifelines.statistics</span> <span class="kw">import</span> <span class="va">logrank_test</span>
+<span class="cm"># df needs: duration (months active), churned (1/0)</span>
+<span class="va">kmf</span> = <span class="va">KaplanMeierFitter</span>()
+<span class="va">kmf</span>.<span class="fn">fit</span>(<span class="va">df</span>[<span class="st">'duration'</span>], event_observed=<span class="va">df</span>[<span class="st">'churned'</span>])
+<span class="va">kmf</span>.<span class="fn">plot_survival_function</span>(ci_show=<span class="kw">True</span>)
+<span class="va">plt</span>.<span class="fn">title</span>(<span class="st">'Kaplan-Meier Survival Curve'</span>); <span class="va">plt</span>.<span class="fn">show</span>()
+<span class="cm"># Compare two cohorts</span>
+<span class="va">g1</span>=<span class="va">df</span>[<span class="va">df</span>[<span class="st">'plan'</span>]==<span class="st">'basic'</span>]; <span class="va">g2</span>=<span class="va">df</span>[<span class="va">df</span>[<span class="st">'plan'</span>]==<span class="st">'premium'</span>]
+<span class="va">res</span> = <span class="fn">logrank_test</span>(<span class="va">g1</span>[<span class="st">'duration'</span>],<span class="va">g2</span>[<span class="st">'duration'</span>],
+    <span class="va">g1</span>[<span class="st">'churned'</span>],<span class="va">g2</span>[<span class="st">'churned'</span>])
+<span class="nb">print</span>(<span class="st">f"Log-rank p={res.p_value:.4f}"</span>)</pre></div></div>
+<div class="sec"><div class="sh"><div class="snum">02</div><div class="si"><h3>Cox Proportional Hazards</h3><p>feature impact on churn risk</p></div></div>
+<div class="cb"><div class="ch"><div class="ctr"><div class="dot" style="background:var(--adv)"></div><div class="clbl">CoxPH hazard ratios — which features drive churn</div></div><div class="cac"><span class="lb">python</span><button class="cpb" onclick="cp(this)">COPY</button></div></div>
+<pre><span class="kw">from</span> <span class="va">lifelines</span> <span class="kw">import</span> <span class="va">CoxPHFitter</span>
+<span class="va">cph</span> = <span class="va">CoxPHFitter</span>()
+<span class="va">cph</span>.<span class="fn">fit</span>(
+    <span class="va">df</span>[[<span class="st">'duration'</span>,<span class="st">'churned'</span>,<span class="st">'age'</span>,<span class="st">'plan'</span>,<span class="st">'monthly_spend'</span>]],
+    duration_col=<span class="st">'duration'</span>, event_col=<span class="st">'churned'</span>)
+<span class="va">cph</span>.<span class="fn">print_summary</span>()
+<span class="va">cph</span>.<span class="fn">plot</span>(); <span class="va">plt</span>.<span class="fn">show</span>()  <span class="cm"># hazard ratio forest plot</span>
+<span class="cm"># Predict median survival for a new user</span>
+<span class="va">new_user</span> = <span class="va">pd</span>.<span class="fn">DataFrame</span>({<span class="st">'age'</span>:[<span class="nm">28</span>],<span class="st">'plan'</span>:[<span class="st">'premium'</span>],<span class="st">'monthly_spend'</span>:[<span class="nm">49</span>]})
+<span class="nb">print</span>(<span class="va">cph</span>.<span class="fn">predict_median</span>(<span class="va">new_user</span>))</pre></div></div>
+</div><!-- coh-adv -->
+</div><!-- page-coh -->
+
+</div><!-- content -->
+</div><!-- main -->
+
+<script>
+const PAGES=['eda','inf','clu','ts','coh'];
+const PNAMES={eda:'Exploratory Data Analysis',inf:'Inferential Analysis',clu:'Cluster Analysis',ts:'Time Series Analysis',coh:'Cohort Analysis'};
+const PSUB={eda:'— EDA',inf:'— Inferential',clu:'— Clustering',ts:'— Time Series',coh:'— Cohort'};
+const PCOL={eda:'var(--eda)',inf:'var(--inf)',clu:'var(--clu)',ts:'var(--ts)',coh:'var(--coh)'};
+let curPage='eda',curLevel='basic';
+
+function setPage(p){
+  curPage=p;
+  PAGES.forEach(id=>{
+    document.getElementById('page-'+id).classList.toggle('active',id===p);
+    document.querySelector('[data-page="'+id+'"]').classList.toggle('active',id===p);
+  });
+  document.getElementById('tb-title').childNodes[0].textContent=PNAMES[p]+' ';
+  const sub=document.getElementById('tb-sub');
+  sub.textContent=PSUB[p]; sub.style.color=PCOL[p];
+  document.getElementById('bc-p').textContent=PNAMES[p].split(' ')[0];
+  setLevel(curLevel);
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function setLevel(l){
+  curLevel=l;
+  document.querySelectorAll('.lt').forEach(t=>t.classList.toggle('active',t.dataset.level===l));
+  document.querySelectorAll('.lsec').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(curPage+'-'+l);
+  if(el) el.classList.add('active');
+  const badge=document.getElementById('lbadge');
+  badge.className='lbadge '+l;
+  badge.textContent=l==='inter'?'INTERMEDIATE':l.toUpperCase();
+  document.getElementById('bc-l').textContent=l.charAt(0).toUpperCase()+l.slice(1);
+}
+
+function cp(btn){
+  const block=btn.closest('.cb,.cbl');
+  const pre=block.querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='OK ✓'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('ok');},1800);
+  });
+}
+</script>
+</body>
+</html>
